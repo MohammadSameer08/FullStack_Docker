@@ -1,0 +1,46 @@
+version: "3.8"
+services:
+  # Backend service
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "5001:5000"
+    environment:
+      - DB_HOST=database
+      - DB_USER=myuser  
+      - DB_PASSWORD=mypassword
+      - DB_NAME=mydatabase
+    depends_on:
+      - database  
+    networks:
+      - my-custom-network  
+  
+  # Frontend service
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80" #  Expose port 80 of the frontend container to port 3000 on the host
+    depends_on:
+      - backend  
+    networks:
+      - my-custom-network    
+  
+  # Database service
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase  
+    volumes:
+      - pgData:/var/lib/postgresql/data
+    networks: 
+      - my-custom-network    
+volumes:
+  pgData:
+networks:
+  my-custom-network:
+    driver: bridge    
